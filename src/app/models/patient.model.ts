@@ -23,15 +23,8 @@ export interface PatientCreateDto {
     contactNumber:  string;
 }
 
-export interface PatientUpdateDto {
+export interface PatientUpdateDto extends PatientListDto {
     id:             number;
-    documentTypeId: number;
-    genderId:       number;
-    firstName:      string;
-    lastName:       string;
-    birhtDate:      Date;
-    address:        string;
-    contactNumber:  string;
 }
 
 

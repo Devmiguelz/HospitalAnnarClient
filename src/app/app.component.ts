@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PatientServiceService } from './services/patient-service.service';
-import { GenericModelDto, PatientListDto } from './models/patient.model';
+import { GenericModelDto, PatientCreateDto, PatientListDto, PatientUpdateDto } from './models/patient.model';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GenericServiceService } from './services/generic-service.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-root',
@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
     patients: PatientListDto[] = [];
     genderList: GenericModelDto[] = [];
     documentTypeList: GenericModelDto[] = [];
+
+    isEdit: boolean = false;
 
     patientForm: FormGroup;
 
@@ -35,11 +37,12 @@ export class AppComponent implements OnInit {
 
     initForm(): void {
         this.patientForm = this.fb.group({
+            id: [''],
             documentTypeId: ['', Validators.required],
             documentNumber: ['', [Validators.required, Validators.maxLength(12)]],
             firstName: ['', [Validators.required, Validators.maxLength(50)]],
             lastName: ['', [Validators.required, Validators.maxLength(50)]],
-            birhtDate: ['', Validators.required],
+            birhtDate: [formatDate(new Date(),'yyyy-MM-dd','en'), Validators.required],
             genderId: ['', Validators.required],
             address: ['', [Validators.required, Validators.maxLength(200)]],
             contactNumber: ['', [Validators.required, Validators.maxLength(15)]]
@@ -66,17 +69,53 @@ export class AppComponent implements OnInit {
         });
     }
 
-
-    addPatient(): void {
-        var data = this.patientForm.value;
-        console.log(data);        
-        this.patientService.Add(data).subscribe(data => {
-            this.getPatients();
-        });
+    addOrUpdatePatient(): void {
+        if(this.isEdit){
+            this.editPatient();
+        }else{
+            this.addPatient();
+        }
     }
 
-    editPatient(patient: PatientListDto): void {
+    cancelPatient(): void {
+        this.patientForm.reset();
+    }
 
+    addPatient(): void {
+
+        if(!this.patientForm.valid) {
+            alert("Form not valid");
+            return;
+        }
+
+        var data: PatientCreateDto = {...this.patientForm.value}; 
+        console.log(data);          
+        this.patientService.Add(data).subscribe(data => {
+            this.getPatients();
+            this.patientForm.reset();
+        });        
+    }
+
+    setDataFormPatient(patient: PatientListDto): void {
+        console.log(patient);        
+        this.isEdit = true;
+        this.patientForm.patchValue(
+            {
+                ...patient, 
+                birhtDate: formatDate(patient.birhtDate,'yyyy-MM-dd','en')
+            });                
+    }
+
+    editPatient(): void {
+        if(!this.patientForm.valid) {
+            alert("Form not valid");
+            return;
+        }
+        var data: PatientUpdateDto = {...this.patientForm.value}; 
+        this.patientService.Add(data).subscribe(data => {
+            this.getPatients();
+            this.patientForm.reset();
+        });  
     }
 
     deletePatient(id: number): void {

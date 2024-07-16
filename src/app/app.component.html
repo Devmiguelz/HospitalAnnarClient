@@ -14,9 +14,10 @@
         <div class="mb-3">
             <label for="gender" class="form-label">Document Type</label>
             <select id="gender" class="form-select" formControlName="documentTypeId">
-                @for (document of documentTypeList; track $index) {
+                <!-- @for (document of documentTypeList; track $index) {
                 <option value="{{document.id}}">{{ document.description }}</option>
-                }
+                } -->
+                <option *ngFor="let document of documentTypeList" value="{{document.id}}">{{ document.description }}</option>
             </select>
         </div>
 
@@ -50,7 +51,8 @@
         </div>
 
         <div class="col-12">
-            <button type="submit" class="btn btn-primary" (click)="addPatient()">Save</button>
+            <button type="submit" class="btn btn-primary mr-3" (click)="addOrUpdatePatient()">{{ isEdit ? 'Update' : 'Save' }}</button>
+            <button type="button" class="btn btn-danger" (click)="cancelPatient()">Cancel</button>
         </div>
     </form>
 </div>
@@ -79,13 +81,13 @@
                 <td>{{ patient.documentNumber }}</td>
                 <td>{{ patient.firstName }}</td>
                 <td>{{ patient.lastName }}</td>
-                <td>{{ patient.birhtDate | date: 'MM/dd/yyyy' }}</td>
+                <td>{{ patient.birhtDate | date: 'dd/MM/yyyy' }}</td>
                 <td>{{ patient.genderDescription }}</td>
                 <td>{{ patient.address }}</td>
                 <td>{{ patient.contactNumber }}</td>
                 <td>{{ patient.active ? 'Activo' : 'Inactivo' }}</td>
                 <td>
-                    <button class="btn btn-info btn-sm m-2" (click)="editPatient(patient)">Editar</button><br>
+                    <button class="btn btn-info btn-sm m-2" (click)="setDataFormPatient(patient)">Editar</button><br>
                     <button class="btn btn-danger btn-sm" (click)="deletePatient(patient.id)">Eliminar</button>
                 </td>
 
